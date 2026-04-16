@@ -6,10 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   collection,
   query,
-  orderBy,
   onSnapshot,
   doc,
   getDoc,
+  where,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { quizStorage } from "@/lib/utils";
@@ -107,19 +107,18 @@ export default function LeaderboardPage() {
     });
   }, [quizId]);
 
-  // Real-time submissions for this quiz
+  // Real-time submissions for this quiz — single equality filter avoids
+  // composite index requirement; sort is done client-side.
   useEffect(() => {
     const q = query(
       collection(db, "submissions"),
-      orderBy("score", "desc"),
-      orderBy("submittedAt", "asc")
+      where("quizId", "==", quizId)
     );
     return onSnapshot(q, (snap) => {
-      setEntries(
-        snap.docs
-          .map((d) => ({ id: d.id, ...(d.data() as Omit<Submission, "id">) }))
-          .filter((s) => s.quizId === quizId)
-      );
+      const sorted = snap.docs
+        .map((d) => ({ id: d.id, ...(d.data() as Omit<Submission, "id">) }))
+        .sort((a, b) => b.score - a.score || a.submittedAt - b.submittedAt);
+      setEntries(sorted);
       setLoading(false);
     });
   }, [quizId]);

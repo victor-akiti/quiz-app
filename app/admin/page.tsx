@@ -9,7 +9,6 @@ import {
   updateDoc,
   addDoc,
   query,
-  orderBy,
   where,
   getDocs,
 } from "firebase/firestore";
@@ -149,13 +148,17 @@ function QuizDetail({ quiz, onBack }: { quiz: QuizBlock; onBack: () => void }) {
   const mcqTotal = quiz.questions.filter((q) => q.type === "mcq").length;
 
   useEffect(() => {
+    // Single equality where avoids composite index; sort newest-first client-side
     const q = query(
       collection(db, "submissions"),
-      where("quizId", "==", quiz.id),
-      orderBy("submittedAt", "desc")
+      where("quizId", "==", quiz.id)
     );
     return onSnapshot(q, (snap) => {
-      setSubs(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Submission, "id">) })));
+      setSubs(
+        snap.docs
+          .map((d) => ({ id: d.id, ...(d.data() as Omit<Submission, "id">) }))
+          .sort((a, b) => b.submittedAt - a.submittedAt)
+      );
       setLoading(false);
     });
   }, [quiz.id]);
