@@ -53,8 +53,10 @@ export default function QuizPage() {
   const isAnswered = currentAnswer.trim().length > 0;
 
   useEffect(() => {
-    // Redirect if no name set
-    if (typeof window !== "undefined" && !localStorage.getItem("quizName")) {
+    if (typeof window === "undefined") return;
+    if (localStorage.getItem("quizSubmitted") === "true") {
+      router.replace("/leaderboard");
+    } else if (!localStorage.getItem("quizName")) {
       router.replace("/");
     }
   }, [router]);

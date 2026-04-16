@@ -11,6 +11,7 @@ import {
   query,
   orderBy,
   onSnapshot,
+  doc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
@@ -121,6 +122,8 @@ function formatDate(ts: number) {
 export default function LeaderboardPage() {
   const [entries, setEntries] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [leaderboardVisible, setLeaderboardVisible] = useState(true);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [currentUser] = useState<string>(
     () =>
       typeof window !== "undefined"
@@ -128,6 +131,17 @@ export default function LeaderboardPage() {
         : ""
   );
   const router = useRouter();
+
+  // Subscribe to admin visibility setting
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, "settings", "config"), (snap) => {
+      setLeaderboardVisible(
+        snap.exists() ? (snap.data().leaderboardVisible ?? true) : true
+      );
+      setSettingsLoaded(true);
+    });
+    return unsub;
+  }, []);
 
   useEffect(() => {
     const q = query(
@@ -155,6 +169,48 @@ export default function LeaderboardPage() {
 
   const isFirst = userRank === 1 && !!currentUser;
   const confettiCanvas = useConfetti(isFirst);
+
+  // Show hidden state once settings are loaded and leaderboard is hidden
+  if (settingsLoaded && !leaderboardVisible) {
+    return (
+      <main className="flex-1 flex items-center justify-center px-4 py-12">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="text-center max-w-sm"
+        >
+          <div
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-5"
+            style={{
+              background: "#1a1a24",
+              border: "1.5px solid #2e2e3e",
+              fontSize: "28px",
+            }}
+          >
+            🔒
+          </div>
+          <h2 className="text-xl font-bold mb-2" style={{ color: "#f1f1f8" }}>
+            Leaderboard is hidden
+          </h2>
+          <p className="text-sm leading-relaxed" style={{ color: "#8888a8" }}>
+            The admin has temporarily hidden the rankings. Check back soon!
+          </p>
+          <a
+            href="/"
+            className="inline-block mt-6 px-5 py-3 rounded-xl text-sm font-semibold"
+            style={{
+              background: "#22222e",
+              border: "1.5px solid #2e2e3e",
+              color: "#8888a8",
+            }}
+          >
+            ← Back to home
+          </a>
+        </motion.div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex-1 flex flex-col items-center px-4 py-8 sm:py-12">

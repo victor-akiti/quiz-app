@@ -7,6 +7,7 @@ import {
   onSnapshot,
   doc,
   updateDoc,
+  setDoc,
   query,
   orderBy,
 } from "firebase/firestore";
@@ -180,9 +181,7 @@ function ScoreInput({
     if (isNaN(num) || num === initialScore) return;
     setSaving(true);
     try {
-      await updateDoc(doc(db, "submissions", submissionId), {
-        score: num,
-      });
+      await updateDoc(doc(db, "submissions", submissionId), { score: num });
       setSaved(true);
       setTimeout(() => setSaved(false), 1500);
     } finally {
@@ -240,6 +239,85 @@ function ScoreInput({
   );
 }
 
+// ─── Leaderboard Toggle ───────────────────────────────────────────────────────
+
+function LeaderboardToggle() {
+  const [visible, setVisible] = useState(true);
+  const [toggling, setToggling] = useState(false);
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, "settings", "config"), (snap) => {
+      setVisible(snap.exists() ? (snap.data().leaderboardVisible ?? true) : true);
+    });
+    return unsub;
+  }, []);
+
+  async function toggle() {
+    setToggling(true);
+    try {
+      await setDoc(
+        doc(db, "settings", "config"),
+        { leaderboardVisible: !visible },
+        { merge: true }
+      );
+    } finally {
+      setToggling(false);
+    }
+  }
+
+  return (
+    <div
+      className="flex items-center justify-between rounded-2xl px-5 py-4 mb-6"
+      style={{
+        background: "#1a1a24",
+        border: `1.5px solid ${visible ? "rgba(52,211,153,0.25)" : "rgba(248,113,113,0.25)"}`,
+      }}
+    >
+      <div>
+        <p className="text-sm font-semibold" style={{ color: "#f1f1f8" }}>
+          Leaderboard visibility
+        </p>
+        <p className="text-xs mt-0.5" style={{ color: "#8888a8" }}>
+          {visible
+            ? "Participants can see the rankings"
+            : "Leaderboard is hidden from participants"}
+        </p>
+      </div>
+
+      <motion.button
+        onClick={toggle}
+        disabled={toggling}
+        whileTap={{ scale: 0.95 }}
+        className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold flex-shrink-0"
+        style={{
+          background: visible
+            ? "rgba(52,211,153,0.12)"
+            : "rgba(248,113,113,0.12)",
+          border: `1.5px solid ${visible ? "rgba(52,211,153,0.35)" : "rgba(248,113,113,0.35)"}`,
+          color: visible ? "#34d399" : "#f87171",
+          minHeight: "40px",
+          opacity: toggling ? 0.6 : 1,
+          cursor: toggling ? "not-allowed" : "pointer",
+        }}
+      >
+        {/* Track */}
+        <div
+          className="relative w-9 h-5 rounded-full transition-colors duration-200 flex-shrink-0"
+          style={{ background: visible ? "#34d399" : "#3e3e52" }}
+        >
+          <motion.div
+            animate={{ x: visible ? 16 : 2 }}
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            className="absolute top-0.5 w-4 h-4 rounded-full"
+            style={{ background: "#ffffff" }}
+          />
+        </div>
+        {visible ? "Visible" : "Hidden"}
+      </motion.button>
+    </div>
+  );
+}
+
 // ─── Main Panel ───────────────────────────────────────────────────────────────
 
 function AdminPanel() {
@@ -270,7 +348,7 @@ function AdminPanel() {
         <motion.div
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between mb-8"
+          className="flex items-center justify-between mb-6"
         >
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: "#f1f1f8" }}>
@@ -291,6 +369,15 @@ function AdminPanel() {
           >
             Leaderboard →
           </a>
+        </motion.div>
+
+        {/* Leaderboard toggle */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <LeaderboardToggle />
         </motion.div>
 
         {/* Submissions */}
@@ -347,18 +434,12 @@ function AdminPanel() {
                       <p className="text-xs uppercase tracking-widest font-semibold" style={{ color: "#8888a8" }}>
                         Score
                       </p>
-                      <ScoreInput
-                        submissionId={sub.id}
-                        initialScore={sub.score}
-                      />
+                      <ScoreInput submissionId={sub.id} initialScore={sub.score} />
                     </div>
                   </div>
 
                   {/* Divider */}
-                  <div
-                    className="mb-4"
-                    style={{ height: "1px", background: "#2e2e3e" }}
-                  />
+                  <div className="mb-4" style={{ height: "1px", background: "#2e2e3e" }} />
 
                   {/* Answers */}
                   <div className="flex flex-col gap-3">
@@ -372,10 +453,7 @@ function AdminPanel() {
                         </p>
                         <p
                           className="text-sm leading-relaxed px-3 py-2 rounded-lg"
-                          style={{
-                            background: "#22222e",
-                            color: "#c0c0d8",
-                          }}
+                          style={{ background: "#22222e", color: "#c0c0d8" }}
                         >
                           {answer}
                         </p>

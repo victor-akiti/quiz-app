@@ -17,6 +17,89 @@ export default function EntryPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const alreadyPlayed =
+    typeof window !== "undefined" &&
+    localStorage.getItem("quizSubmitted") === "true" &&
+    !!localStorage.getItem("quizName");
+
+  const playedName =
+    typeof window !== "undefined"
+      ? (localStorage.getItem("quizName") ?? "")
+      : "";
+
+  if (alreadyPlayed) {
+    return (
+      <main className="flex-1 flex items-center justify-center px-4 py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full max-w-md text-center"
+        >
+          <div
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-5"
+            style={{
+              background: "linear-gradient(135deg, #7c6ff7, #5b4fcf)",
+              boxShadow: "0 8px 32px rgba(124,111,247,0.4)",
+              fontSize: "28px",
+            }}
+          >
+            ✅
+          </div>
+          <h1 className="text-3xl font-bold mb-2" style={{ color: "#f1f1f8" }}>
+            Already submitted!
+          </h1>
+          <p className="text-sm mb-1" style={{ color: "#8888a8" }}>
+            You played as
+          </p>
+          <p className="text-lg font-semibold mb-6" style={{ color: "#a89cf8" }}>
+            {playedName}
+          </p>
+
+          <div className="flex flex-col gap-3">
+            <motion.a
+              href="/leaderboard"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              className="block w-full py-3.5 rounded-xl text-base font-semibold text-center"
+              style={{
+                background: "linear-gradient(135deg, #7c6ff7, #5b4fcf)",
+                color: "#ffffff",
+                minHeight: "52px",
+                boxShadow: "0 4px 20px rgba(124,111,247,0.35)",
+              }}
+            >
+              View Leaderboard →
+            </motion.a>
+            <motion.button
+              onClick={() => {
+                localStorage.removeItem("quizSubmitted");
+                localStorage.removeItem("quizName");
+                window.location.reload();
+              }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              className="w-full py-3.5 rounded-xl text-sm font-semibold"
+              style={{
+                background: "#22222e",
+                border: "1.5px solid #2e2e3e",
+                color: "#8888a8",
+                minHeight: "52px",
+              }}
+            >
+              Play with a different name
+            </motion.button>
+          </div>
+          <p className="mt-4 text-xs" style={{ color: "#2e2e3e" }}>
+            Note: each name can only be used once
+          </p>
+        </motion.div>
+      </main>
+    );
+  }
+
   async function handleStart() {
     const trimmed = name.trim();
     if (!trimmed) {
