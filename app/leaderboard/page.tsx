@@ -121,14 +121,13 @@ function formatDate(ts: number) {
 export default function LeaderboardPage() {
   const [entries, setEntries] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState<string>("");
+  const [currentUser] = useState<string>(
+    () =>
+      typeof window !== "undefined"
+        ? (localStorage.getItem("quizName") ?? "")
+        : ""
+  );
   const router = useRouter();
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setCurrentUser(localStorage.getItem("quizName") ?? "");
-    }
-  }, []);
 
   useEffect(() => {
     const q = query(

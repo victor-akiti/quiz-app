@@ -395,13 +395,11 @@ function AdminPanel() {
 // ─── Page Export ──────────────────────────────────────────────────────────────
 
 export default function AdminPage() {
-  const [unlocked, setUnlocked] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setUnlocked(sessionStorage.getItem("adminUnlocked") === "true");
-    }
-  }, []);
+  const [unlocked, setUnlocked] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      sessionStorage.getItem("adminUnlocked") === "true"
+  );
 
   function handleUnlock() {
     sessionStorage.setItem("adminUnlocked", "true");
