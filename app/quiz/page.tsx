@@ -85,6 +85,10 @@ export default function QuizPage() {
     }
 
     const name = localStorage.getItem("quizName") ?? "Unknown";
+    // Read token (guaranteed to exist — entry page created it before routing here)
+    const deviceToken = localStorage.getItem("quizDeviceToken") ?? crypto.randomUUID();
+    localStorage.setItem("quizDeviceToken", deviceToken);
+
     setSubmitting(true);
     setSubmitError("");
 
@@ -94,9 +98,11 @@ export default function QuizPage() {
         name,
         answers,
         score,
+        deviceToken,
         submittedAt: Date.now(),
       });
       localStorage.setItem("quizSubmitted", "true");
+      localStorage.setItem("quizScore", String(score));
       router.push("/leaderboard");
     } catch {
       setSubmitError("Failed to submit. Please try again.");

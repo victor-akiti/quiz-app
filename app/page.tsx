@@ -1,104 +1,78 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
+import { motion, AnimatePresence } from "framer-motion";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+
+interface PriorSubmission {
+  name: string;
+  score: number;
+}
+
+// Get or create a persistent anonymous token for this browser
+function getOrCreateToken(): string {
+  const stored = localStorage.getItem("quizDeviceToken");
+  if (stored) return stored;
+  const fresh = crypto.randomUUID();
+  localStorage.setItem("quizDeviceToken", fresh);
+  return fresh;
+}
 
 export default function EntryPage() {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Persistent device token — created once, survives refreshes
+  const [deviceToken] = useState<string>(() =>
+    typeof window !== "undefined" ? getOrCreateToken() : ""
+  );
+
+  // Prior submission found via localStorage (fast) or Firestore (fallback)
+  const [prior, setPrior] = useState<PriorSubmission | null>(null);
+  const [checking, setChecking] = useState(true);
+
   const router = useRouter();
 
-  const alreadyPlayed =
-    typeof window !== "undefined" &&
-    localStorage.getItem("quizSubmitted") === "true" &&
-    !!localStorage.getItem("quizName");
+  useEffect(() => {
+    if (!deviceToken) {
+      setChecking(false);
+      return;
+    }
 
-  const playedName =
-    typeof window !== "undefined"
-      ? (localStorage.getItem("quizName") ?? "")
-      : "";
+    // Fast path: localStorage flags are intact
+    if (localStorage.getItem("quizSubmitted") === "true") {
+      setPrior({
+        name: localStorage.getItem("quizName") ?? "",
+        score: parseInt(localStorage.getItem("quizScore") ?? "0", 10),
+      });
+      setChecking(false);
+      return;
+    }
 
-  if (alreadyPlayed) {
-    return (
-      <main className="flex-1 flex items-center justify-center px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 32 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full max-w-md text-center"
-        >
-          <div
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-5"
-            style={{
-              background: "linear-gradient(135deg, #7c6ff7, #5b4fcf)",
-              boxShadow: "0 8px 32px rgba(124,111,247,0.4)",
-              fontSize: "28px",
-            }}
-          >
-            ✅
-          </div>
-          <h1 className="text-3xl font-bold mb-2" style={{ color: "#f1f1f8" }}>
-            Already submitted!
-          </h1>
-          <p className="text-sm mb-1" style={{ color: "#8888a8" }}>
-            You played as
-          </p>
-          <p className="text-lg font-semibold mb-6" style={{ color: "#a89cf8" }}>
-            {playedName}
-          </p>
-
-          <div className="flex flex-col gap-3">
-            <motion.a
-              href="/leaderboard"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
-              className="block w-full py-3.5 rounded-xl text-base font-semibold text-center"
-              style={{
-                background: "linear-gradient(135deg, #7c6ff7, #5b4fcf)",
-                color: "#ffffff",
-                minHeight: "52px",
-                boxShadow: "0 4px 20px rgba(124,111,247,0.35)",
-              }}
-            >
-              View Leaderboard →
-            </motion.a>
-            <motion.button
-              onClick={() => {
-                localStorage.removeItem("quizSubmitted");
-                localStorage.removeItem("quizName");
-                window.location.reload();
-              }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
-              className="w-full py-3.5 rounded-xl text-sm font-semibold"
-              style={{
-                background: "#22222e",
-                border: "1.5px solid #2e2e3e",
-                color: "#8888a8",
-                minHeight: "52px",
-              }}
-            >
-              Play with a different name
-            </motion.button>
-          </div>
-          <p className="mt-4 text-xs" style={{ color: "#2e2e3e" }}>
-            Note: each name can only be used once
-          </p>
-        </motion.div>
-      </main>
-    );
-  }
+    // Slow path: localStorage was cleared but token survived — check Firestore
+    getDocs(
+      query(
+        collection(db, "submissions"),
+        where("deviceToken", "==", deviceToken)
+      )
+    )
+      .then((snap) => {
+        if (!snap.empty) {
+          const data = snap.docs[0].data();
+          const foundName = data.name as string;
+          const foundScore = data.score as number;
+          setPrior({ name: foundName, score: foundScore });
+          // Restore fast-path flags so next visit skips the Firestore query
+          localStorage.setItem("quizSubmitted", "true");
+          localStorage.setItem("quizName", foundName);
+          localStorage.setItem("quizScore", String(foundScore));
+        }
+      })
+      .finally(() => setChecking(false));
+  }, [deviceToken]);
 
   async function handleStart() {
     const trimmed = name.trim();
@@ -111,12 +85,9 @@ export default function EntryPage() {
     setError("");
 
     try {
-      // Check uniqueness
-      const q = query(
-        collection(db, "submissions"),
-        where("name", "==", trimmed)
+      const snap = await getDocs(
+        query(collection(db, "submissions"), where("name", "==", trimmed))
       );
-      const snap = await getDocs(q);
 
       if (!snap.empty) {
         setError("That name is already taken. Pick a different one!");
@@ -132,6 +103,163 @@ export default function EntryPage() {
     }
   }
 
+  // ── Loading state while we verify the device token ──────────────────────────
+  if (checking) {
+    return (
+      <main className="flex-1 flex items-center justify-center px-4 py-12">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="w-full max-w-md"
+        >
+          {/* Skeleton hero */}
+          <div className="text-center mb-10">
+            <div
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+              style={{
+                background: "linear-gradient(135deg, #7c6ff7, #5b4fcf)",
+                boxShadow: "0 8px 32px rgba(124,111,247,0.4)",
+              }}
+            >
+              <span className="text-2xl font-bold text-white">Q</span>
+            </div>
+            <h1 className="text-4xl font-bold tracking-tight" style={{ color: "#f1f1f8" }}>
+              QuizArena
+            </h1>
+          </div>
+          <div
+            className="rounded-2xl p-6 sm:p-8 animate-pulse"
+            style={{ background: "#1a1a24", border: "1px solid #2e2e3e", height: "160px" }}
+          />
+        </motion.div>
+      </main>
+    );
+  }
+
+  // ── Already played ───────────────────────────────────────────────────────────
+  if (prior) {
+    const mcqTotal = 10; // number of MCQ questions
+
+    return (
+      <main className="flex-1 flex items-center justify-center px-4 py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full max-w-md"
+        >
+          {/* Hero */}
+          <div className="text-center mb-8">
+            <div
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+              style={{
+                background: "linear-gradient(135deg, #7c6ff7, #5b4fcf)",
+                boxShadow: "0 8px 32px rgba(124,111,247,0.4)",
+              }}
+            >
+              <span className="text-2xl font-bold text-white">Q</span>
+            </div>
+            <h1 className="text-4xl font-bold tracking-tight" style={{ color: "#f1f1f8" }}>
+              QuizArena
+            </h1>
+          </div>
+
+          {/* Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="rounded-2xl p-6 sm:p-8 text-center"
+            style={{
+              background: "#1a1a24",
+              border: "1px solid #2e2e3e",
+              boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
+            }}
+          >
+            <div className="text-3xl mb-3">✅</div>
+            <h2 className="text-xl font-bold mb-1" style={{ color: "#f1f1f8" }}>
+              Already submitted!
+            </h2>
+            <p className="text-sm mb-5" style={{ color: "#8888a8" }}>
+              This device has already played as
+            </p>
+
+            {/* Player + score */}
+            <div
+              className="flex items-center justify-between rounded-xl px-4 py-3 mb-6"
+              style={{ background: "#22222e", border: "1.5px solid #2e2e3e" }}
+            >
+              <div className="text-left">
+                <p className="text-xs uppercase tracking-widest font-semibold mb-0.5" style={{ color: "#8888a8" }}>
+                  Player
+                </p>
+                <p className="font-bold" style={{ color: "#a89cf8" }}>
+                  {prior.name}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs uppercase tracking-widest font-semibold mb-0.5" style={{ color: "#8888a8" }}>
+                  Score
+                </p>
+                <p className="text-2xl font-bold" style={{ color: "#f1f1f8" }}>
+                  {prior.score}
+                  <span className="text-sm font-normal ml-1" style={{ color: "#8888a8" }}>
+                    / {mcqTotal}
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <motion.a
+                href="/leaderboard"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                className="block w-full py-3.5 rounded-xl text-base font-semibold text-center"
+                style={{
+                  background: "linear-gradient(135deg, #7c6ff7, #5b4fcf)",
+                  color: "#ffffff",
+                  minHeight: "52px",
+                  boxShadow: "0 4px 20px rgba(124,111,247,0.35)",
+                }}
+              >
+                View Leaderboard →
+              </motion.a>
+
+              <motion.button
+                onClick={() => {
+                  localStorage.removeItem("quizSubmitted");
+                  localStorage.removeItem("quizName");
+                  localStorage.removeItem("quizScore");
+                  localStorage.removeItem("quizDeviceToken");
+                  window.location.reload();
+                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                className="w-full py-3.5 rounded-xl text-sm font-semibold"
+                style={{
+                  background: "#22222e",
+                  border: "1.5px solid #2e2e3e",
+                  color: "#8888a8",
+                  minHeight: "52px",
+                }}
+              >
+                Play with a different name
+              </motion.button>
+            </div>
+
+            <p className="mt-4 text-xs leading-relaxed" style={{ color: "#3e3e52" }}>
+              Each device can only submit once. Your name is also permanently reserved.
+            </p>
+          </motion.div>
+        </motion.div>
+      </main>
+    );
+  }
+
+  // ── Entry form ───────────────────────────────────────────────────────────────
   return (
     <main className="flex-1 flex items-center justify-center px-4 py-12">
       <motion.div
@@ -211,16 +339,20 @@ export default function EntryPage() {
             }}
           />
 
-          {error && (
-            <motion.p
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-2 text-sm font-medium"
-              style={{ color: "#f87171" }}
-            >
-              {error}
-            </motion.p>
-          )}
+          <AnimatePresence>
+            {error && (
+              <motion.p
+                key="error"
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="mt-2 text-sm font-medium"
+                style={{ color: "#f87171" }}
+              >
+                {error}
+              </motion.p>
+            )}
+          </AnimatePresence>
 
           <motion.button
             onClick={handleStart}
@@ -228,7 +360,7 @@ export default function EntryPage() {
             whileHover={{ scale: loading ? 1 : 1.02 }}
             whileTap={{ scale: loading ? 1 : 0.97 }}
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            className="mt-5 w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-base font-semibold transition-opacity"
+            className="mt-5 w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-base font-semibold"
             style={{
               background: loading
                 ? "#2e2e3e"
