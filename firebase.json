@@ -1,0 +1,17 @@
+{
+  "apiKey": "AIzaSyCQSsuV9MTT_MaXj2yn1WTB3otINrsjYWQ",
+  "authDomain": "quiz-app-fd2fe.firebaseapp.com",
+  "projectId": "quiz-app-fd2fe",
+  "storageBucket": "quiz-app-fd2fe.firebasestorage.app",
+  "messagingSenderId": "973285410072",
+  "appId": "1:973285410072:web:87a90416be467c8cc6ca6d",
+  "measurementId": "G-DZ9D11ZT00",
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
