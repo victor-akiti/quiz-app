@@ -5,9 +5,9 @@
   --color-surface: #1a1a24;
   --color-surface-raised: #22222e;
   --color-border: #2e2e3e;
-  --color-accent: #7c6ff7;
-  --color-accent-light: #a89cf8;
-  --color-accent-glow: rgba(124, 111, 247, 0.25);
+  --color-accent: #E07820;
+  --color-accent-light: #F0A050;
+  --color-accent-glow: rgba(224, 120, 32, 0.25);
   --color-success: #34d399;
   --color-danger: #f87171;
   --color-text-primary: #f1f1f8;
@@ -50,7 +50,7 @@ body {
 
 /* Focus ring */
 :focus-visible {
-  outline: 2px solid #7c6ff7;
+  outline: 2px solid #E07820;
   outline-offset: 2px;
   border-radius: 6px;
 }

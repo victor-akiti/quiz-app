@@ -59,8 +59,8 @@ function QuizCard({
       className="block rounded-2xl p-5 sm:p-6 cursor-pointer"
       style={{
         background: "#1a1a24",
-        border: `1.5px solid ${played ? "rgba(124,111,247,0.35)" : "#2e2e3e"}`,
-        boxShadow: played ? "0 0 0 1px rgba(124,111,247,0.1)" : "none",
+        border: `1.5px solid ${played ? "rgba(224,120,32,0.35)" : "#2e2e3e"}`,
+        boxShadow: played ? "0 0 0 1px rgba(224,120,32,0.1)" : "none",
         textDecoration: "none",
       }}
     >
@@ -71,8 +71,8 @@ function QuizCard({
             <span
               className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full mb-2"
               style={{
-                background: "rgba(124,111,247,0.12)",
-                color: "#a89cf8",
+                background: "rgba(224,120,32,0.12)",
+                color: "#F0A050",
               }}
             >
               {quiz.category}
@@ -114,8 +114,8 @@ function QuizCard({
             <span
               className="text-xs font-semibold px-2 py-0.5 rounded-full"
               style={{
-                background: "rgba(124,111,247,0.15)",
-                color: "#a89cf8",
+                background: "rgba(224,120,32,0.15)",
+                color: "#F0A050",
               }}
             >
               Your score: {score} / {mcqCount}
@@ -126,7 +126,7 @@ function QuizCard({
         <span
           className="text-sm font-semibold"
           style={{
-            color: played ? "#a89cf8" : isLocked ? "#8888a8" : "#34d399",
+            color: played ? "#F0A050" : isLocked ? "#8888a8" : "#34d399",
           }}
         >
           {ctaLabel}
@@ -165,17 +165,17 @@ export default function HomePage() {
           <div
             className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
             style={{
-              background: "linear-gradient(135deg, #7c6ff7, #5b4fcf)",
-              boxShadow: "0 8px 32px rgba(124,111,247,0.4)",
+              background: "linear-gradient(135deg, #E07820, #C96E10)",
+              boxShadow: "0 8px 32px rgba(224,120,32,0.4)",
             }}
           >
-            <span className="text-2xl font-bold text-white">Q</span>
+            <span className="text-xl font-black text-white tracking-tight">AMNI</span>
           </div>
           <h1
             className="text-4xl font-bold tracking-tight"
             style={{ color: "#f1f1f8" }}
           >
-            QuizArena
+            Amni Quiz Portal
           </h1>
           <p className="mt-2 text-base" style={{ color: "#8888a8" }}>
             Select a quiz to begin competing

@@ -8,8 +8,8 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "QuizArena — Compete & Conquer",
-  description: "A fast, animated quiz competition with a live leaderboard.",
+  title: "Amni Quiz Portal — Knowledge & Competition",
+  description: "Amni's interactive quiz platform with live leaderboards.",
 };
 
 export const viewport: Viewport = {

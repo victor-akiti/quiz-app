@@ -104,7 +104,7 @@ function NameEntry({
         <div className="text-center mb-8">
           {quiz.category && (
             <span className="inline-block text-xs font-semibold px-2.5 py-1 rounded-full mb-3"
-              style={{ background: "rgba(124,111,247,0.12)", color: "#a89cf8" }}>
+              style={{ background: "rgba(224,120,32,0.12)", color: "#F0A050" }}>
               {quiz.category}
             </span>
           )}
@@ -138,7 +138,7 @@ function NameEntry({
               color: "#f1f1f8", outline: "none", borderRadius: "12px",
               padding: "12px 16px", fontSize: "1rem", minHeight: "52px",
             }}
-            onFocus={(e) => { if (!error) e.target.style.borderColor = "#7c6ff7"; }}
+            onFocus={(e) => { if (!error) e.target.style.borderColor = "#E07820"; }}
             onBlur={(e) => { if (!error) e.target.style.borderColor = "#2e2e3e"; }}
           />
 
@@ -159,10 +159,10 @@ function NameEntry({
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
             className="mt-5 w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-base font-semibold"
             style={{
-              background: checking ? "#2e2e3e" : "linear-gradient(135deg, #7c6ff7, #5b4fcf)",
+              background: checking ? "#2e2e3e" : "linear-gradient(135deg, #E07820, #C96E10)",
               color: checking ? "#8888a8" : "#fff",
               minHeight: "52px",
-              boxShadow: checking ? "none" : "0 4px 20px rgba(124,111,247,0.35)",
+              boxShadow: checking ? "none" : "0 4px 20px rgba(224,120,32,0.35)",
               cursor: checking ? "not-allowed" : "pointer",
             }}
           >
@@ -244,7 +244,7 @@ function QuizPlay({
             <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#8888a8" }}>
               {quiz.title}
             </p>
-            <p className="text-sm font-medium mt-0.5" style={{ color: "#a89cf8" }}>
+            <p className="text-sm font-medium mt-0.5" style={{ color: "#F0A050" }}>
               Question {index + 1} of {total}
             </p>
           </div>
@@ -260,7 +260,7 @@ function QuizPlay({
           <motion.div animate={{ width: `${progress}%` }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             className="h-full rounded-full"
-            style={{ background: "linear-gradient(90deg, #7c6ff7, #a89cf8)" }} />
+            style={{ background: "linear-gradient(90deg, #E07820, #F0A050)" }} />
         </div>
 
         {/* Question card */}
@@ -277,8 +277,8 @@ function QuizPlay({
             >
               <span className="inline-block text-xs font-semibold px-2.5 py-1 rounded-full mb-4"
                 style={{
-                  background: question.type === "mcq" ? "rgba(124,111,247,0.15)" : "rgba(52,211,153,0.15)",
-                  color: question.type === "mcq" ? "#a89cf8" : "#34d399",
+                  background: question.type === "mcq" ? "rgba(224,120,32,0.15)" : "rgba(52,211,153,0.15)",
+                  color: question.type === "mcq" ? "#F0A050" : "#34d399",
                 }}>
                 {question.type === "mcq" ? "Multiple Choice" : "Short Answer"}
               </span>
@@ -298,16 +298,16 @@ function QuizPlay({
                         transition={{ type: "spring", stiffness: 400, damping: 20 }}
                         className="w-full flex items-center gap-3 rounded-xl px-4 py-3.5 text-left"
                         style={{
-                          background: selected ? "rgba(124,111,247,0.18)" : "#22222e",
-                          border: `1.5px solid ${selected ? "#7c6ff7" : "#2e2e3e"}`,
+                          background: selected ? "rgba(224,120,32,0.18)" : "#22222e",
+                          border: `1.5px solid ${selected ? "#E07820" : "#2e2e3e"}`,
                           color: selected ? "#f1f1f8" : "#c0c0d8",
                           minHeight: "52px",
-                          boxShadow: selected ? "0 0 0 3px rgba(124,111,247,0.2)" : "none",
+                          boxShadow: selected ? "0 0 0 3px rgba(224,120,32,0.2)" : "none",
                         }}
                       >
                         <span className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
                           style={{
-                            background: selected ? "linear-gradient(135deg, #7c6ff7, #5b4fcf)" : "#2e2e3e",
+                            background: selected ? "linear-gradient(135deg, #E07820, #C96E10)" : "#2e2e3e",
                             color: selected ? "#fff" : "#8888a8",
                           }}>
                           {String.fromCharCode(65 + i)}
@@ -315,7 +315,7 @@ function QuizPlay({
                         <span className="text-sm sm:text-base font-medium">{opt}</span>
                         {selected && (
                           <motion.span initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                            className="ml-auto" style={{ color: "#7c6ff7" }}>✓</motion.span>
+                            className="ml-auto" style={{ color: "#E07820" }}>✓</motion.span>
                         )}
                       </motion.button>
                     );
@@ -335,7 +335,7 @@ function QuizPlay({
                       background: "#22222e", border: "1.5px solid #2e2e3e",
                       color: "#f1f1f8", outline: "none", lineHeight: "1.6",
                     }}
-                    onFocus={(e) => (e.target.style.borderColor = "#7c6ff7")}
+                    onFocus={(e) => (e.target.style.borderColor = "#E07820")}
                     onBlur={(e) => (e.target.style.borderColor = "#2e2e3e")}
                   />
                   <p className="mt-1.5 text-xs" style={{ color: "#8888a8" }}>
@@ -376,10 +376,10 @@ function QuizPlay({
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
               className="flex-1 py-3.5 rounded-xl text-sm font-semibold"
               style={{
-                background: isAnswered ? "linear-gradient(135deg, #7c6ff7, #5b4fcf)" : "#22222e",
+                background: isAnswered ? "linear-gradient(135deg, #E07820, #C96E10)" : "#22222e",
                 border: `1.5px solid ${isAnswered ? "transparent" : "#2e2e3e"}`,
                 color: isAnswered ? "#fff" : "#8888a8", minHeight: "52px",
-                boxShadow: isAnswered ? "0 4px 20px rgba(124,111,247,0.35)" : "none",
+                boxShadow: isAnswered ? "0 4px 20px rgba(224,120,32,0.35)" : "none",
                 cursor: isAnswered ? "pointer" : "not-allowed",
               }}>
               Next →
@@ -409,7 +409,7 @@ function QuizPlay({
               className="rounded-full"
               style={{
                 width: i === index ? "28px" : "8px", height: "8px",
-                background: answers[q.id]?.trim() ? "#7c6ff7" : i === index ? "#a89cf8" : "#2e2e3e",
+                background: answers[q.id]?.trim() ? "#E07820" : i === index ? "#F0A050" : "#2e2e3e",
               }} />
           ))}
         </div>
@@ -484,7 +484,7 @@ export default function QuizPage() {
         <p className="text-lg font-semibold" style={{ color: "#f1f1f8" }}>
           {phase.tag === "not-found" ? "Quiz not found." : "This quiz is not available."}
         </p>
-        <a href="/" className="text-sm" style={{ color: "#a89cf8" }}>← Back to quizzes</a>
+        <a href="/" className="text-sm" style={{ color: "#F0A050" }}>← Back to quizzes</a>
       </main>
     );
   }
@@ -499,7 +499,7 @@ export default function QuizPage() {
         </p>
         <a href={`/leaderboard/${quizId}`}
           className="mt-2 px-5 py-3 rounded-xl text-sm font-semibold"
-          style={{ background: "rgba(124,111,247,0.12)", border: "1.5px solid rgba(124,111,247,0.3)", color: "#a89cf8" }}>
+          style={{ background: "rgba(224,120,32,0.12)", border: "1.5px solid rgba(224,120,32,0.3)", color: "#F0A050" }}>
           View Leaderboard →
         </a>
         <a href="/" className="text-sm" style={{ color: "#8888a8" }}>← Back to quizzes</a>
@@ -516,13 +516,13 @@ export default function QuizPage() {
           <div className="text-4xl mb-4">✅</div>
           <h2 className="text-xl font-bold mb-1" style={{ color: "#f1f1f8" }}>Already submitted!</h2>
           <p className="text-sm mb-5" style={{ color: "#8888a8" }}>
-            You played as <span style={{ color: "#a89cf8", fontWeight: 600 }}>{phase.name}</span> and
+            You played as <span style={{ color: "#F0A050", fontWeight: 600 }}>{phase.name}</span> and
             scored <span style={{ color: "#f1f1f8", fontWeight: 700 }}>{phase.score}</span> point{phase.score !== 1 ? "s" : ""}.
           </p>
           <div className="flex flex-col gap-3">
             <a href={`/leaderboard/${quizId}`}
               className="block w-full py-3.5 rounded-xl text-sm font-semibold text-center"
-              style={{ background: "linear-gradient(135deg, #7c6ff7, #5b4fcf)", color: "#fff", minHeight: "52px", boxShadow: "0 4px 20px rgba(124,111,247,0.35)" }}>
+              style={{ background: "linear-gradient(135deg, #E07820, #C96E10)", color: "#fff", minHeight: "52px", boxShadow: "0 4px 20px rgba(224,120,32,0.35)" }}>
               View Leaderboard →
             </a>
             <a href="/" className="block w-full py-3.5 rounded-xl text-sm font-semibold text-center"

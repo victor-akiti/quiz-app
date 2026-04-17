@@ -78,7 +78,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
               color: "#f1f1f8", outline: "none", borderRadius: "12px",
               padding: "12px 16px", minHeight: "52px", fontSize: "1rem",
             }}
-            onFocus={(e) => { if (!error) e.target.style.borderColor = "#7c6ff7"; }}
+            onFocus={(e) => { if (!error) e.target.style.borderColor = "#E07820"; }}
             onBlur={(e) => { if (!error) e.target.style.borderColor = "#2e2e3e"; }}
           />
           {error && (
@@ -91,7 +91,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
             whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
             className="mt-4 w-full py-3.5 rounded-xl text-base font-semibold"
-            style={{ background: "linear-gradient(135deg, #7c6ff7, #5b4fcf)", color: "#fff", minHeight: "52px", boxShadow: "0 4px 20px rgba(124,111,247,0.35)" }}>
+            style={{ background: "linear-gradient(135deg, #E07820, #C96E10)", color: "#fff", minHeight: "52px", boxShadow: "0 4px 20px rgba(224,120,32,0.35)" }}>
             Unlock
           </motion.button>
         </motion.div>
@@ -128,7 +128,7 @@ function ScoreInput({ submissionId, initialScore }: { submissionId: string; init
         onBlur={handleBlur}
         className="w-20 rounded-lg px-3 py-2 text-sm font-bold text-center"
         style={{ background: "#22222e", border: "1.5px solid #3e3e52", color: "#f1f1f8", outline: "none" }}
-        onFocus={(e) => (e.target.style.borderColor = "#7c6ff7")}
+        onFocus={(e) => (e.target.style.borderColor = "#E07820")}
       />
       <AnimatePresence>
         {saving && <motion.span key="saving" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -326,7 +326,7 @@ function QuizList({ onSelect }: { onSelect: (quiz: QuizBlock) => void }) {
           </p>
         </div>
         <a href="/" className="text-sm font-medium px-3 py-2 rounded-xl"
-          style={{ background: "rgba(124,111,247,0.12)", border: "1.5px solid rgba(124,111,247,0.3)", color: "#a89cf8" }}>
+          style={{ background: "rgba(224,120,32,0.12)", border: "1.5px solid rgba(224,120,32,0.3)", color: "#F0A050" }}>
           ← Home
         </a>
       </div>
@@ -346,9 +346,9 @@ function QuizList({ onSelect }: { onSelect: (quiz: QuizBlock) => void }) {
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
             className="px-5 py-3 rounded-xl text-sm font-semibold"
             style={{
-              background: seeding ? "#2e2e3e" : "linear-gradient(135deg, #7c6ff7, #5b4fcf)",
+              background: seeding ? "#2e2e3e" : "linear-gradient(135deg, #E07820, #C96E10)",
               color: seeding ? "#8888a8" : "#fff",
-              boxShadow: seeding ? "none" : "0 4px 20px rgba(124,111,247,0.35)",
+              boxShadow: seeding ? "none" : "0 4px 20px rgba(224,120,32,0.35)",
             }}>
             {seeding ? "Seeding…" : "Seed Initial Quizzes"}
           </motion.button>
@@ -363,7 +363,7 @@ function QuizList({ onSelect }: { onSelect: (quiz: QuizBlock) => void }) {
             className="px-4 py-2 rounded-xl text-xs font-semibold"
             style={{
               background: "#22222e", border: "1.5px solid #2e2e3e",
-              color: seeding ? "#8888a8" : "#a89cf8",
+              color: seeding ? "#8888a8" : "#F0A050",
               opacity: seeding ? 0.6 : 1,
             }}>
             {seeding ? "Seeding…" : "+ Re-seed quizzes"}
@@ -395,7 +395,7 @@ function QuizList({ onSelect }: { onSelect: (quiz: QuizBlock) => void }) {
                     <div className="flex-1 min-w-0">
                       {quiz.category && (
                         <span className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full mb-1"
-                          style={{ background: "rgba(124,111,247,0.12)", color: "#a89cf8" }}>
+                          style={{ background: "rgba(224,120,32,0.12)", color: "#F0A050" }}>
                           {quiz.category}
                         </span>
                       )}
@@ -420,7 +420,7 @@ function QuizList({ onSelect }: { onSelect: (quiz: QuizBlock) => void }) {
                     <div className="flex items-center justify-between">
                       <a href={`/leaderboard/${quiz.id}`}
                         className="text-xs font-medium" style={{ color: "#8888a8" }}
-                        onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "#a89cf8")}
+                        onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "#F0A050")}
                         onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "#8888a8")}>
                         View leaderboard →
                       </a>
@@ -428,7 +428,7 @@ function QuizList({ onSelect }: { onSelect: (quiz: QuizBlock) => void }) {
                         onClick={() => onSelect(quiz)}
                         whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
                         className="text-xs font-semibold px-3 py-1.5 rounded-lg"
-                        style={{ background: "rgba(124,111,247,0.12)", border: "1.5px solid rgba(124,111,247,0.25)", color: "#a89cf8" }}>
+                        style={{ background: "rgba(224,120,32,0.12)", border: "1.5px solid rgba(224,120,32,0.25)", color: "#F0A050" }}>
                         Submissions →
                       </motion.button>
                     </div>

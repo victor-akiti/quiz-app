@@ -30,7 +30,7 @@ function useConfetti(active: boolean) {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const colors = ["#7c6ff7", "#a89cf8", "#34d399", "#f59e0b", "#f87171", "#60a5fa"];
+    const colors = ["#E07820", "#F0A050", "#C96E10", "#f59e0b", "#34d399", "#f1f1f8"];
     const pieces = Array.from({ length: 120 }, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height - canvas.height,
@@ -145,7 +145,7 @@ export default function LeaderboardPage() {
             <>
               {quiz?.category && (
                 <span className="inline-block text-xs font-semibold px-2.5 py-1 rounded-full mb-2"
-                  style={{ background: "rgba(124,111,247,0.12)", color: "#a89cf8" }}>
+                  style={{ background: "rgba(224,120,32,0.12)", color: "#F0A050" }}>
                   {quiz.category}
                 </span>
               )}
@@ -163,9 +163,9 @@ export default function LeaderboardPage() {
               transition={{ delay: 0.3, duration: 0.4 }}
               className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
               style={{
-                background: userRank === 1 ? "rgba(251,191,36,0.15)" : "rgba(124,111,247,0.15)",
-                color: userRank === 1 ? "#fbbf24" : "#a89cf8",
-                border: `1px solid ${userRank === 1 ? "rgba(251,191,36,0.3)" : "rgba(124,111,247,0.3)"}`,
+                background: userRank === 1 ? "rgba(251,191,36,0.15)" : "rgba(224,120,32,0.15)",
+                color: userRank === 1 ? "#fbbf24" : "#F0A050",
+                border: `1px solid ${userRank === 1 ? "rgba(251,191,36,0.3)" : "rgba(224,120,32,0.3)"}`,
               }}>
               {userRank === 1 ? "👑 " : ""}You are #{userRank}
               {userRank === 1 && " — You're winning!"}
@@ -182,7 +182,7 @@ export default function LeaderboardPage() {
           </a>
           <a href="/admin"
             className="flex-1 py-3 rounded-xl text-sm font-semibold text-center"
-            style={{ background: "rgba(124,111,247,0.12)", border: "1.5px solid rgba(124,111,247,0.3)", color: "#a89cf8", minHeight: "48px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            style={{ background: "rgba(224,120,32,0.12)", border: "1.5px solid rgba(224,120,32,0.3)", color: "#F0A050", minHeight: "48px", display: "flex", alignItems: "center", justifyContent: "center" }}>
             Admin Panel
           </a>
         </div>
@@ -218,8 +218,8 @@ export default function LeaderboardPage() {
                     transition={{ delay: i * 0.05, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                     className="flex items-center gap-4 rounded-2xl px-4 sm:px-5 py-4"
                     style={{
-                      background: isCurrentUser ? "rgba(124,111,247,0.12)" : isTop3 ? RANK_BG[rank - 1] : "#1a1a24",
-                      border: `1.5px solid ${isCurrentUser ? "rgba(124,111,247,0.4)" : isTop3 ? `rgba(${rgbStr},0.25)` : "#2e2e3e"}`,
+                      background: isCurrentUser ? "rgba(224,120,32,0.12)" : isTop3 ? RANK_BG[rank - 1] : "#1a1a24",
+                      border: `1.5px solid ${isCurrentUser ? "rgba(224,120,32,0.4)" : isTop3 ? `rgba(${rgbStr},0.25)` : "#2e2e3e"}`,
                       boxShadow: isTop3 ? RANK_GLOW[rank - 1] : "none",
                     }}>
                     {/* Rank badge */}
@@ -236,12 +236,12 @@ export default function LeaderboardPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-sm sm:text-base truncate"
-                          style={{ color: isCurrentUser ? "#a89cf8" : "#f1f1f8" }}>
+                          style={{ color: isCurrentUser ? "#F0A050" : "#f1f1f8" }}>
                           {entry.name}
                         </p>
                         {isCurrentUser && (
                           <span className="text-xs px-2 py-0.5 rounded-full flex-shrink-0 font-medium"
-                            style={{ background: "rgba(124,111,247,0.2)", color: "#a89cf8" }}>
+                            style={{ background: "rgba(224,120,32,0.2)", color: "#F0A050" }}>
                             you
                           </span>
                         )}
