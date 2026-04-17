@@ -15,6 +15,7 @@ import {
 import { db } from "@/lib/firebase";
 import { SEED_QUIZZES } from "@/data/quizzes";
 import type { QuizBlock, QuizStatus, Submission } from "@/lib/types";
+import Link from "next/link";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -325,10 +326,10 @@ function QuizList({ onSelect }: { onSelect: (quiz: QuizBlock) => void }) {
             {loading ? "Loading…" : `${quizzes.length} quiz${quizzes.length !== 1 ? "zes" : ""}`} · Live
           </p>
         </div>
-        <a href="/" className="text-sm font-medium px-3 py-2 rounded-xl"
+        <Link href="/" className="text-sm font-medium px-3 py-2 rounded-xl"
           style={{ background: "rgba(224,120,32,0.12)", border: "1.5px solid rgba(224,120,32,0.3)", color: "#F0A050" }}>
           ← Home
-        </a>
+        </Link>
       </div>
 
       {/* Seed button (shown only when no quizzes exist) */}
