@@ -27,8 +27,7 @@ type Phase =
   | { tag: "closed" }
   | { tag: "already-played"; name: string; score: number }
   | { tag: "name-entry"; quiz: QuizBlock }
-  | { tag: "playing"; quiz: QuizBlock; playerName: string }
-  | { tag: "submitting" };
+  | { tag: "playing"; quiz: QuizBlock; playerName: string };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -184,15 +183,14 @@ function NameEntry({
 function QuizPlay({
   quiz,
   playerName,
-  onSubmitted,
 }: {
   quiz: QuizBlock;
   playerName: string;
-  onSubmitted: () => void;
 }) {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [answers, setAnswers] = useState<Answers>({});
+  const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const router = useRouter();
 
@@ -214,7 +212,7 @@ function QuizPlay({
       }
     }
 
-    onSubmitted(); // show submitting screen
+    setSubmitting(true);
     setSubmitError("");
 
     try {
@@ -232,6 +230,7 @@ function QuizPlay({
       router.push(`/leaderboard/${quiz.id}`);
     } catch {
       setSubmitError("Failed to submit. Please try again.");
+      setSubmitting(false);
     }
   }
 
@@ -386,18 +385,19 @@ function QuizPlay({
               Next →
             </motion.button>
           ) : (
-            <motion.button onClick={handleSubmit} disabled={!isAnswered}
-              whileHover={{ scale: isAnswered ? 1.02 : 1 }} whileTap={{ scale: isAnswered ? 0.97 : 1 }}
+            <motion.button onClick={handleSubmit} disabled={!isAnswered || submitting}
+              whileHover={{ scale: isAnswered && !submitting ? 1.02 : 1 }}
+              whileTap={{ scale: isAnswered && !submitting ? 0.97 : 1 }}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
-              className="flex-1 py-3.5 rounded-xl text-sm font-semibold"
+              className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-semibold"
               style={{
-                background: isAnswered ? "linear-gradient(135deg, #34d399, #059669)" : "#22222e",
-                border: `1.5px solid ${isAnswered ? "transparent" : "#2e2e3e"}`,
-                color: isAnswered ? "#fff" : "#8888a8", minHeight: "52px",
-                boxShadow: isAnswered ? "0 4px 20px rgba(52,211,153,0.3)" : "none",
-                cursor: isAnswered ? "pointer" : "not-allowed",
+                background: isAnswered && !submitting ? "linear-gradient(135deg, #34d399, #059669)" : "#22222e",
+                border: `1.5px solid ${isAnswered && !submitting ? "transparent" : "#2e2e3e"}`,
+                color: isAnswered && !submitting ? "#fff" : "#8888a8", minHeight: "52px",
+                boxShadow: isAnswered && !submitting ? "0 4px 20px rgba(52,211,153,0.3)" : "none",
+                cursor: isAnswered && !submitting ? "pointer" : "not-allowed",
               }}>
-              Submit Answers ✓
+              {submitting ? <><Spinner />Submitting…</> : "Submit Answers ✓"}
             </motion.button>
           )}
         </div>
@@ -535,23 +535,6 @@ export default function QuizPage() {
     );
   }
 
-  if (phase.tag === "submitting") {
-    return (
-      <main className="flex-1 flex flex-col items-center justify-center gap-4 px-4">
-        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg, #7c6ff7, #5b4fcf)", boxShadow: "0 0 40px rgba(124,111,247,0.5)" }}>
-            <Spinner size={28} />
-          </div>
-          <p className="text-lg font-semibold" style={{ color: "#f1f1f8" }}>Submitting your answers…</p>
-          <p className="text-sm" style={{ color: "#8888a8" }}>Calculating your score</p>
-        </motion.div>
-      </main>
-    );
-  }
-
   if (phase.tag === "name-entry") {
     return (
       <main className="flex-1 flex flex-col">
@@ -570,7 +553,6 @@ export default function QuizPage() {
     <QuizPlay
       quiz={phase.quiz}
       playerName={phase.playerName}
-      onSubmitted={() => setPhase({ tag: "submitting" })}
     />
   );
 }
